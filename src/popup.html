@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>GrindSync</title>
+  <style>
+    body { width: 320px; font-family: system-ui, sans-serif; background: #09090b; color: #f4f4f5; margin: 0; padding: 16px; }
+    h1 { font-size: 1.2rem; color: #a5b4fc; margin-top: 0; }
+    .hidden { display: none !important; }
+    input { width: 100%; box-sizing: border-box; padding: 8px; margin-bottom: 8px; border-radius: 6px; border: 1px solid #3f3f46; background: #18181b; color: white; }
+    button { width: 100%; background: #4f46e5; color: white; border: none; padding: 8px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+    button:hover { background: #4338ca; }
+    button:disabled { background: #3f3f46; color: #a1a1aa; cursor: not-allowed; }
+    .card { background: #18181b; border: 1px solid #27272a; padding: 12px; border-radius: 8px; margin-bottom: 12px; }
+    .text-sm { font-size: 0.875rem; color: #a1a1aa; }
+  </style>
+</head>
+<body>
+  <h1>GrindSync Tracker</h1>
+  <p id="statusMsg" class="text-sm" style="margin-bottom: 8px;"></p>
+
+  <div id="authScreen">
+    <div class="card">
+      <p class="text-sm" style="margin-top: 0">Login to your account</p>
+      <input type="email" id="emailInput" placeholder="Email" />
+      <input type="password" id="passwordInput" placeholder="Password" />
+      <button id="loginBtn">Login</button>
+    </div>
+  </div>
+
+  <div id="trackerScreen" class="hidden">
+    <div class="card">
+      <p class="text-sm" style="margin-top: 0">Active Problem</p>
+      <div id="problemTitle" style="font-weight: 500; margin-bottom: 4px; word-break: break-all;">Looking for problem...</div>
+      <div class="text-sm">Time tracked: <span id="timeTracker">00:00</span></div>
+    </div>
+    <button id="logManualBtn" disabled>Log as Solved</button>
+    <button id="logoutBtn" style="margin-top:8px; background: transparent; border: 1px solid #3f3f46;">Logout</button>
+  </div>
+
+  <script src="../dist/popup.js"></script>
+</body>
+</html>

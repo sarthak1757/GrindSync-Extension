@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "GrindSync Extension",
+  "version": "1.0.0",
+  "description": "Tracks time spent on LeetCode/Codeforces and logs to GrindSync.",
+  "permissions": ["storage", "tabs"],
+  "host_permissions": [
+    "*://leetcode.com/*",
+    "*://*.leetcode.com/*",
+    "*://codeforces.com/*",
+    "*://*.codeforces.com/*"
+  ],
+  "background": {
+    "service_worker": "dist/background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://leetcode.com/problems/*",
+        "*://*.leetcode.com/problems/*",
+        "*://codeforces.com/problemset/problem/*",
+        "*://codeforces.com/contest/*/problem/*",
+        "*://codeforces.com/gym/*/problem/*",
+        "*://codeforces.com/group/*/contest/*/problem/*"
+      ],
+      "js": ["dist/content.js"]
+    }
+  ],
+  "action": {
+    "default_popup": "src/popup.html"
+  }
+}
