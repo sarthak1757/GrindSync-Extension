@@ -13,7 +13,13 @@ const ui = {
   logoutBtn: document.getElementById('logoutBtn'),
   problemTitle: document.getElementById('problemTitle'),
   timeTracker: document.getElementById('timeTracker'),
+  extUriDisplay: document.getElementById('extUriDisplay'),
 };
+
+// Set debug URI
+if (ui.extUriDisplay && chrome.runtime.id) {
+  ui.extUriDisplay.textContent = `chrome-extension://${chrome.runtime.id}`;
+}
 
 let currentProblem = null;
 let currentUrl = null;
