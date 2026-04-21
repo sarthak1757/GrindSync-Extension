@@ -11,8 +11,20 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 });
 
+function waitForAuth() {
+  return new Promise((resolve, reject) => {
+    const unsubscribe = auth.onAuthStateChanged(user => {
+      unsubscribe();
+      resolve(user);
+    }, error => {
+      unsubscribe();
+      reject(error);
+    });
+  });
+}
+
 async function handleLogQuestion(payload) {
-  const user = auth.currentUser;
+  const user = await waitForAuth();
   if (!user) {
     throw new Error('User not logged in. Please log in via the GrindSync extension popup.');
   }
