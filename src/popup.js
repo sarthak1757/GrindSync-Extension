@@ -1,4 +1,4 @@
-import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
+import { signInWithEmailAndPassword, signOut, onAuthStateChanged, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { auth } from './firebase.js';
 
 const ui = {
@@ -8,6 +8,7 @@ const ui = {
   emailInput: document.getElementById('emailInput'),
   passwordInput: document.getElementById('passwordInput'),
   loginBtn: document.getElementById('loginBtn'),
+  googleLoginBtn: document.getElementById('googleLoginBtn'),
   logManualBtn: document.getElementById('logManualBtn'),
   logoutBtn: document.getElementById('logoutBtn'),
   problemTitle: document.getElementById('problemTitle'),
@@ -46,6 +47,21 @@ ui.loginBtn.addEventListener('click', async () => {
   } finally {
     ui.loginBtn.disabled = false;
     ui.loginBtn.textContent = 'Login';
+  }
+});
+
+ui.googleLoginBtn.addEventListener('click', async () => {
+  try {
+    ui.googleLoginBtn.disabled = true;
+    ui.googleLoginBtn.textContent = 'Please wait...';
+    const provider = new GoogleAuthProvider();
+    await signInWithPopup(auth, provider);
+  } catch (error) {
+    ui.statusMsg.textContent = error.message;
+    ui.statusMsg.style.color = '#f87171';
+  } finally {
+    ui.googleLoginBtn.disabled = false;
+    ui.googleLoginBtn.textContent = 'Continue with Google';
   }
 });
 
