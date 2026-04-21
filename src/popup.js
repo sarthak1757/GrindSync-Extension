@@ -1,11 +1,13 @@
-import { signOut, onAuthStateChanged } from 'firebase/auth';
+import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
 import { auth } from './firebase.js';
 
 const ui = {
   authScreen: document.getElementById('authScreen'),
   trackerScreen: document.getElementById('trackerScreen'),
   statusMsg: document.getElementById('statusMsg'),
-  loginToWebAppBtn: document.getElementById('loginToWebAppBtn'),
+  emailInput: document.getElementById('emailInput'),
+  passwordInput: document.getElementById('passwordInput'),
+  loginBtn: document.getElementById('loginBtn'),
   logManualBtn: document.getElementById('logManualBtn'),
   logoutBtn: document.getElementById('logoutBtn'),
   problemTitle: document.getElementById('problemTitle'),
@@ -33,11 +35,19 @@ onAuthStateChanged(auth, (user) => {
 });
 
 // Auth Actions
-if (ui.loginToWebAppBtn) {
-  ui.loginToWebAppBtn.addEventListener('click', () => {
-    chrome.tabs.create({ url: 'http://localhost:5174/login' });
-  });
-}
+ui.loginBtn.addEventListener('click', async () => {
+  try {
+    ui.loginBtn.disabled = true;
+    ui.loginBtn.textContent = 'Logging in...';
+    await signInWithEmailAndPassword(auth, ui.emailInput.value, ui.passwordInput.value);
+  } catch (error) {
+    ui.statusMsg.textContent = error.message;
+    ui.statusMsg.style.color = '#f87171';
+  } finally {
+    ui.loginBtn.disabled = false;
+    ui.loginBtn.textContent = 'Login';
+  }
+});
 
 ui.logoutBtn.addEventListener('click', () => signOut(auth));
 
