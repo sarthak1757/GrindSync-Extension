@@ -14,7 +14,7 @@ if (fs.existsSync(envPath)) {
 }
 
 const options = {
-  entryPoints: ['src/background.js', 'src/content.js', 'src/popup.js'],
+  entryPoints: ['src/background.js', 'src/content.js', 'src/popup.js', 'src/auth.js'],
   bundle: true,
   outdir: 'dist',
   define: definedEnv,

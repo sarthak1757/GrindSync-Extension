@@ -56,19 +56,8 @@ ui.loginBtn.addEventListener('click', async () => {
   }
 });
 
-ui.googleLoginBtn.addEventListener('click', async () => {
-  try {
-    ui.googleLoginBtn.disabled = true;
-    ui.googleLoginBtn.textContent = 'Please wait...';
-    const provider = new GoogleAuthProvider();
-    await signInWithPopup(auth, provider);
-  } catch (error) {
-    ui.statusMsg.textContent = error.message;
-    ui.statusMsg.style.color = '#f87171';
-  } finally {
-    ui.googleLoginBtn.disabled = false;
-    ui.googleLoginBtn.textContent = 'Continue with Google';
-  }
+ui.googleLoginBtn.addEventListener('click', () => {
+  chrome.tabs.create({ url: chrome.runtime.getURL('src/auth.html') });
 });
 
 ui.logoutBtn.addEventListener('click', () => signOut(auth));
