@@ -1,4 +1,4 @@
-import { signInWithEmailAndPassword, signOut, onAuthStateChanged, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
 import { auth } from './firebase.js';
 
 const ui = {
@@ -8,18 +8,11 @@ const ui = {
   emailInput: document.getElementById('emailInput'),
   passwordInput: document.getElementById('passwordInput'),
   loginBtn: document.getElementById('loginBtn'),
-  googleLoginBtn: document.getElementById('googleLoginBtn'),
   logManualBtn: document.getElementById('logManualBtn'),
   logoutBtn: document.getElementById('logoutBtn'),
   problemTitle: document.getElementById('problemTitle'),
   timeTracker: document.getElementById('timeTracker'),
-  extUriDisplay: document.getElementById('extUriDisplay'),
 };
-
-// Set debug URI
-if (ui.extUriDisplay && chrome.runtime.id) {
-  ui.extUriDisplay.textContent = `chrome-extension://${chrome.runtime.id}`;
-}
 
 let currentProblem = null;
 let currentUrl = null;
@@ -54,10 +47,6 @@ ui.loginBtn.addEventListener('click', async () => {
     ui.loginBtn.disabled = false;
     ui.loginBtn.textContent = 'Login';
   }
-});
-
-ui.googleLoginBtn.addEventListener('click', () => {
-  chrome.tabs.create({ url: chrome.runtime.getURL('src/auth.html') });
 });
 
 ui.logoutBtn.addEventListener('click', () => signOut(auth));
