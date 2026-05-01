@@ -2,40 +2,455 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>GrindSync</title>
+  <title>GrindSync Tracker</title>
   <style>
-    body { width: 320px; font-family: system-ui, sans-serif; background: #09090b; color: #f4f4f5; margin: 0; padding: 16px; }
-    h1 { font-size: 1.2rem; color: #a5b4fc; margin-top: 0; }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      width: 360px;
+      min-height: 480px;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: #09090b;
+      color: #f4f4f5;
+      font-size: 13px;
+    }
+
     .hidden { display: none !important; }
-    input { width: 100%; box-sizing: border-box; padding: 8px; margin-bottom: 8px; border-radius: 6px; border: 1px solid #3f3f46; background: #18181b; color: white; }
-    button { width: 100%; background: #4f46e5; color: white; border: none; padding: 8px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-    button:hover { background: #4338ca; }
-    button:disabled { background: #3f3f46; color: #a1a1aa; cursor: not-allowed; }
-    .card { background: #18181b; border: 1px solid #27272a; padding: 12px; border-radius: 8px; margin-bottom: 12px; }
-    .text-sm { font-size: 0.875rem; color: #a1a1aa; }
+
+    /* ── AUTH ──────────────────────────────── */
+    #authScreen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 480px;
+      padding: 24px;
+      gap: 16px;
+    }
+
+    .auth-brand {
+      font-size: 22px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #818cf8, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 4px;
+    }
+
+    .auth-sub { color: #71717a; font-size: 12px; margin-bottom: 8px; }
+
+    .auth-card {
+      width: 100%;
+      background: rgba(24,24,27,0.9);
+      border: 1px solid #27272a;
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    input[type="email"], input[type="password"] {
+      width: 100%;
+      background: #18181b;
+      border: 1px solid #3f3f46;
+      border-radius: 10px;
+      color: #f4f4f5;
+      font: inherit;
+      font-size: 13px;
+      padding: 10px 12px;
+      outline: none;
+      transition: border-color 150ms;
+    }
+    input:focus { border-color: #6366f1; }
+
+    .status-msg {
+      font-size: 11px;
+      font-weight: 600;
+      min-height: 16px;
+      text-align: center;
+    }
+
+    /* ── TRACKER SCREEN ─────────────────────── */
+    #trackerScreen { display: flex; flex-direction: column; height: 100%; }
+
+    /* Header */
+    .gs-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px 12px;
+      border-bottom: 1px solid #1f1f23;
+    }
+
+    .gs-logo {
+      font-size: 15px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #818cf8, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .gs-user {
+      font-size: 11px;
+      font-weight: 600;
+      color: #a1a1aa;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .gs-user-dot {
+      width: 6px; height: 6px;
+      background: #22c55e;
+      border-radius: 50%;
+    }
+
+    /* Sections */
+    .gs-section { padding: 12px 16px; border-bottom: 1px solid #1f1f23; }
+    .gs-section-label {
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #52525b;
+      margin-bottom: 10px;
+    }
+
+    /* Active problem */
+    .problem-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: #f4f4f5;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 6px;
+    }
+
+    .problem-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .difficulty-pill {
+      padding: 2px 8px;
+      border-radius: 99px;
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: capitalize;
+    }
+
+    .difficulty-pill.easy    { background: rgba(34,197,94,0.15); color: #86efac; }
+    .difficulty-pill.medium  { background: rgba(234,179,8,0.15);  color: #fde047; }
+    .difficulty-pill.hard    { background: rgba(239,68,68,0.15);  color: #fca5a5; }
+    .difficulty-pill.intermediate { background: rgba(234,179,8,0.15); color: #fde047; }
+    .difficulty-pill.beginner     { background: rgba(34,197,94,0.15); color: #86efac; }
+    .difficulty-pill.advanced     { background: rgba(239,68,68,0.15); color: #fca5a5; }
+
+    .timer-display {
+      font-size: 12px;
+      font-weight: 700;
+      color: #a1a1aa;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .timer-dot {
+      width: 5px; height: 5px;
+      background: #22c55e;
+      border-radius: 50%;
+      animation: blink 1.4s ease-in-out infinite;
+    }
+
+    .timer-dot.paused { background: #f59e0b; animation: none; }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* No problem state */
+    .no-problem-msg {
+      text-align: center;
+      padding: 20px 12px;
+      color: #52525b;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.5;
+    }
+
+    .no-problem-msg span { font-size: 24px; display: block; margin-bottom: 8px; }
+
+    /* Action buttons */
+    .action-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .btn {
+      width: 100%;
+      min-height: 36px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: opacity 130ms, transform 130ms, background 130ms;
+    }
+
+    .btn:active { transform: scale(0.97); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      color: #fff;
+      box-shadow: 0 0 16px rgba(99,102,241,0.35);
+    }
+    .btn-primary:hover:not(:disabled) { opacity: 0.9; }
+
+    .btn-secondary {
+      background: #18181b;
+      border: 1px solid #27272a;
+      color: #e4e4e7;
+    }
+    .btn-secondary:hover:not(:disabled) { background: #27272a; border-color: #3f3f46; }
+
+    .btn-danger {
+      background: #18181b;
+      border: 1px solid #3f3f46;
+      color: #f87171;
+    }
+    .btn-danger:hover { background: rgba(239,68,68,0.1); }
+
+    /* Perceived difficulty */
+    #perceivedRow {
+      display: flex;
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .feel-label { font-size: 10px; color: #a1a1aa; font-weight: 700; margin-bottom: 5px; }
+    .feel-btn {
+      flex: 1;
+      min-height: 28px;
+      border-radius: 99px;
+      border: 1px solid #3f3f46;
+      background: #18181b;
+      cursor: pointer;
+      font: inherit;
+      font-size: 10px;
+      font-weight: 800;
+      color: #a1a1aa;
+      transition: background 140ms, border-color 140ms, color 140ms;
+    }
+    .feel-btn.easy  { border-color: rgba(34,197,94,0.4); color: #86efac; }
+    .feel-btn.easy:hover  { background: rgba(34,197,94,0.15); }
+    .feel-btn.okay  { border-color: rgba(99,102,241,0.4); color: #c7d2fe; }
+    .feel-btn.okay:hover  { background: rgba(99,102,241,0.15); }
+    .feel-btn.hard  { border-color: rgba(239,68,68,0.4); color: #fca5a5; }
+    .feel-btn.hard:hover  { background: rgba(239,68,68,0.12); }
+
+    /* Inline status */
+    .inline-status {
+      font-size: 11px;
+      font-weight: 700;
+      min-height: 14px;
+      margin-top: 8px;
+    }
+
+    /* Challenge friend list */
+    #challengePanel { display: none; margin-top: 10px; }
+    #challengePanel.visible { display: block; }
+
+    .friend-list {
+      max-height: 130px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin-bottom: 8px;
+    }
+
+    .friend-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 9px;
+      border-radius: 9px;
+      border: 1px solid #27272a;
+      background: #18181b;
+      cursor: pointer;
+      transition: border-color 130ms, background 130ms;
+    }
+
+    .friend-row:hover, .friend-row.selected {
+      border-color: rgba(99,102,241,0.5);
+      background: rgba(99,102,241,0.1);
+    }
+
+    .friend-avatar {
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 900; color: white;
+      flex-shrink: 0;
+    }
+
+    .friend-name { font-weight: 700; color: #e4e4e7; flex: 1; }
+
+    .friend-check {
+      width: 14px; height: 14px;
+      border-radius: 4px;
+      border: 1.5px solid #3f3f46;
+      background: transparent;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px; color: #6366f1;
+    }
+
+    .friend-row.selected .friend-check {
+      background: #4f46e5;
+      border-color: #4f46e5;
+    }
+
+    .friend-row.selected .friend-check::after { content: '✓'; color: white; }
+
+    /* Recent activity */
+    .activity-list { display: flex; flex-direction: column; gap: 5px; }
+
+    .activity-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      border-radius: 9px;
+      background: #18181b;
+      border: 1px solid #27272a;
+      cursor: pointer;
+      text-decoration: none;
+      transition: border-color 130ms;
+    }
+    .activity-item:hover { border-color: #3f3f46; }
+
+    .activity-check {
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: rgba(34,197,94,0.15);
+      color: #4ade80;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px; font-weight: 900; flex-shrink: 0;
+    }
+
+    .activity-title { color: #e4e4e7; font-weight: 700; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .activity-time { color: #52525b; font-size: 10px; font-weight: 600; flex-shrink: 0; }
+
+    /* Footer */
+    .gs-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin-top: auto;
+    }
+
+    .btn-link {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font: inherit;
+      font-size: 11px;
+      font-weight: 700;
+      color: #6366f1;
+      padding: 4px 6px;
+      border-radius: 6px;
+      transition: background 130ms;
+    }
+    .btn-link:hover { background: rgba(99,102,241,0.1); }
+
+    .btn-link.logout { color: #71717a; }
+    .btn-link.logout:hover { color: #f87171; background: rgba(239,68,68,0.08); }
+
+    /* Stats in footer */
+    .footer-stats {
+      display: flex;
+      gap: 12px;
+    }
+    .stat-item { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+    .stat-val { font-size: 14px; font-weight: 900; color: #a5b4fc; }
+    .stat-lbl { font-size: 9px; font-weight: 700; color: #52525b; text-transform: uppercase; letter-spacing: 0.05em; }
   </style>
 </head>
 <body>
-  <h1>GrindSync Tracker</h1>
-  <p id="statusMsg" class="text-sm" style="margin-bottom: 8px;"></p>
 
+  <!-- AUTH SCREEN -->
   <div id="authScreen">
-    <div class="card">
-      <p class="text-sm" style="margin-top: 0">Login to your account</p>
-      <input type="email" id="emailInput" placeholder="Email" />
-      <input type="password" id="passwordInput" placeholder="Password" />
-      <button id="loginBtn">Login</button>
+    <div class="auth-brand">🧠 GrindSync</div>
+    <p class="auth-sub">Sign in to start tracking</p>
+    <div class="auth-card">
+      <input type="email" id="emailInput" placeholder="Email" autocomplete="email" />
+      <input type="password" id="passwordInput" placeholder="Password" autocomplete="current-password" />
+      <button class="btn btn-primary" id="loginBtn">Login</button>
     </div>
+    <p class="status-msg" id="authStatusMsg"></p>
   </div>
 
+  <!-- TRACKER SCREEN -->
   <div id="trackerScreen" class="hidden">
-    <div class="card">
-      <p class="text-sm" style="margin-top: 0">Active Problem</p>
-      <div id="problemTitle" style="font-weight: 500; margin-bottom: 4px; word-break: break-all;">Looking for problem...</div>
-      <div class="text-sm">Time tracked: <span id="timeTracker">00:00</span></div>
+    <!-- Header -->
+    <header class="gs-header">
+      <div class="gs-logo">🧠 GrindSync</div>
+      <div class="gs-user">
+        <div class="gs-user-dot"></div>
+        <span id="userLabel">Loading...</span>
+      </div>
+    </header>
+
+    <!-- Active Problem Section -->
+    <div class="gs-section" id="problemSection">
+      <div class="gs-section-label">Active Problem</div>
+      <div id="activeProblem">
+        <!-- Filled dynamically -->
+      </div>
     </div>
-    <button id="logManualBtn" disabled>Log as Solved</button>
-    <button id="logoutBtn" style="margin-top:8px; background: transparent; border: 1px solid #3f3f46;">Logout</button>
+
+    <!-- Recent Activity -->
+    <div class="gs-section">
+      <div class="gs-section-label">Recent Activity</div>
+      <div class="activity-list" id="activityList">
+        <div style="color:#52525b; font-size:11px; text-align:center; padding:8px 0;">No activity yet</div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="gs-footer">
+      <div class="footer-stats">
+        <div class="stat-item">
+          <span class="stat-val" id="statSolved">—</span>
+          <span class="stat-lbl">Solved</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-val" id="statStreak">—</span>
+          <span class="stat-lbl">Streak</span>
+        </div>
+      </div>
+      <div style="display:flex; gap:4px;">
+        <button class="btn-link" id="dashboardBtn">Dashboard →</button>
+        <button class="btn-link logout" id="logoutBtn">Logout</button>
+      </div>
+    </footer>
   </div>
 
   <script src="../dist/popup.js"></script>
