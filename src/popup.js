@@ -62,7 +62,8 @@ passwordInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') loginB
 logoutBtn.addEventListener('click', () => signOut(auth));
 
 dashboardBtn.addEventListener('click', () => {
-  chrome.tabs.create({ url: 'https://grind-sync-seven.vercel.app/dashboard' });
+  const baseUrl = process.env.VITE_APP_URL || 'https://grind-sync-seven.vercel.app';
+  chrome.tabs.create({ url: `${baseUrl}/dashboard` });
 });
 
 // ── Main Init ─────────────────────────────────────────────────────────────────

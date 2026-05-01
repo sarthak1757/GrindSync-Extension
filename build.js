@@ -13,6 +13,11 @@ if (fs.existsSync(envPath)) {
   }
 }
 
+// Add app URL if not provided
+if (!definedEnv['process.env.VITE_APP_URL']) {
+  definedEnv['process.env.VITE_APP_URL'] = JSON.stringify('https://grind-sync-seven.vercel.app');
+}
+
 const options = {
   // content-ui.js and challenge-modal.js removed — floating widget deleted
   entryPoints: ['src/background.js', 'src/content.js', 'src/popup.js', 'src/auth.js'],
