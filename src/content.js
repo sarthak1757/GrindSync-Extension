@@ -2,6 +2,29 @@ let timeSpentSeconds = 0;
 let lastActiveTime = Date.now();
 let isVisible = !document.hidden;
 let hasLoggedAuto = false;
+let isPaused = false;
+
+function getPauseStorageKey() {
+  return `${window.location.href}:paused`;
+}
+
+chrome.storage.local.get([getPauseStorageKey()], (result) => {
+  isPaused = Boolean(result[getPauseStorageKey()]);
+  if (isPaused) lastActiveTime = Date.now();
+});
+
+chrome.storage.onChanged.addListener((changes, areaName) => {
+  if (areaName !== 'local') return;
+  const pauseChange = changes[getPauseStorageKey()];
+  if (!pauseChange) return;
+  const nextPaused = Boolean(pauseChange.newValue);
+  if (nextPaused && !isPaused && isVisible) {
+    timeSpentSeconds += (Date.now() - lastActiveTime) / 1000;
+    chrome.storage.local.set({ [window.location.href]: timeSpentSeconds });
+  }
+  isPaused = nextPaused;
+  lastActiveTime = Date.now();
+});
 
 // Time tracking
 document.addEventListener('visibilitychange', () => {
@@ -18,11 +41,13 @@ document.addEventListener('visibilitychange', () => {
 });
 
 function getTotalSeconds() {
+  if (isPaused) return timeSpentSeconds;
   const currentSession = isVisible ? (Date.now() - lastActiveTime) / 1000 : 0;
   return timeSpentSeconds + currentSession;
 }
 
 function saveTimeToStorage() {
+  if (isPaused) return;
   chrome.storage.local.set({ [window.location.href]: getTotalSeconds() });
 }
 
@@ -65,6 +90,21 @@ if (window.location.href.includes('leetcode.com') || window.location.href.includ
   observer.observe(document.body, { childList: true, subtree: true });
 }
 
+function extractPlatformAverageTime(platform) {
+  if (platform !== 'leetcode') return null;
+  // LeetCode submission result page shows runtime in ms, e.g. "Accepted\n42 ms"
+  // Look for a pattern like "XX ms" near the accepted header
+  const bodyText = document.body.innerText;
+  const runtimeMatch = bodyText.match(/(\d+)\s*ms/);
+  if (runtimeMatch) {
+    const ms = parseInt(runtimeMatch[1], 10);
+    // Convert milliseconds to minutes, minimum 0.1
+    const mins = Math.max(0.1, Math.round((ms / 1000 / 60) * 10) / 10);
+    return mins;
+  }
+  return null;
+}
+
 function getProblemDetails() {
   const url = window.location.href;
   let platform = 'unknown';
@@ -89,5 +129,7 @@ function getProblemDetails() {
   let totalMinutes = Math.round(getTotalSeconds() / 60);
   if (totalMinutes < 1) totalMinutes = 1;
 
-  return { title, url, platform, timeTakenMins: totalMinutes, difficulty };
+  const platformAverageTime = extractPlatformAverageTime(platform);
+
+  return { title, url, platform, timeTakenMins: totalMinutes, difficulty, platformAverageTime };
 }
