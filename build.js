@@ -14,6 +14,7 @@ if (fs.existsSync(envPath)) {
 }
 
 const options = {
+  // content-ui.js and challenge-modal.js removed — floating widget deleted
   entryPoints: ['src/background.js', 'src/content.js', 'src/popup.js', 'src/auth.js'],
   bundle: true,
   outdir: 'dist',
@@ -28,5 +29,9 @@ if (process.argv.includes('--watch')) {
     console.log('Watching for changes...');
   });
 } else {
-  esbuild.build(options).then(() => console.log('Build complete.')).catch(() => process.exit(1));
+  esbuild.build(options)
+    .then(() => {
+      console.log('Build complete.');
+    })
+    .catch(() => process.exit(1));
 }
